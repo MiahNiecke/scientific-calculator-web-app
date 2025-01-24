@@ -50,3 +50,11 @@ input:focus {
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
+
+#clear-button {
+    background-color: rgb(103, 130, 139);
+}
+
+#clear-button:hover {
+    background-color: rgb(83, 110, 129);
+}
