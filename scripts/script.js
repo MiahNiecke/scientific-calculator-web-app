@@ -1,9 +1,10 @@
 const display = document.getElementById("display");
 const buttons = document.querySelectorAll(".buttons button");
 const clearButton = document.getElementById("clear-button");
+const backspaceButton = document.getElementById("backspace");
 
 function isValidInput(value) {
-  const validChars = /^[0-9+\-x÷.]$/;
+  const validChars = /^[0-9+\-x÷().]$/;
   return validChars.test(value);
 }
 
@@ -32,4 +33,8 @@ document.addEventListener("keydown", (event) => {
 
 clearButton.addEventListener("click", () => {
   display.value = "";
+});
+
+backspaceButton.addEventListener("click", () => {
+  display.value = display.value.slice(0, -1);
 });

@@ -51,10 +51,12 @@ input:focus {
     gap: 10px;
 }
 
-#clear-button {
+#clear-button,
+#backspace {
     background-color: rgb(103, 130, 139);
 }
 
-#clear-button:hover {
+#clear-button:hover,
+#backspace:hover {
     background-color: rgb(83, 110, 129);
 }
