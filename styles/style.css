@@ -11,7 +11,17 @@ body {
 button {
     font-size: 20px;
     margin: 2px;
-    padding: 5px
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #FF6F61;
+    color: #fff;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #E65A50;
 }
 
 .calculator {
@@ -21,10 +31,18 @@ button {
     padding: 20px;
 }
 
-.input {
+input {
     font-size: 25px;
-    padding: 10px;
+    padding: 15px;
     margin-bottom: 20px;
+    border: 0.5px solid #FF8977;
+    border-radius: 8px;
+    background: #f4f4f9;
+}
+
+input:focus {
+    outline: none;
+    border: 3px solid #E65A50;
 }
 
 .buttons {
