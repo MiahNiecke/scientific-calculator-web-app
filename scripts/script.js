@@ -1,7 +1,10 @@
+import { evaluateExpression } from "./calculate.js";
+
 const display = document.getElementById("display");
 const buttons = document.querySelectorAll(".buttons button");
 const clearButton = document.getElementById("clear-button");
 const backspaceButton = document.getElementById("backspace");
+const calculateButton = document.getElementById("calculate");
 
 function isValidInput(value) {
   const validChars = /^[0-9+\-x÷().]$/;
@@ -22,9 +25,9 @@ document.addEventListener("keydown", (event) => {
 
   if (!isValidInput(key)) {
     event.preventDefault();
-  } else {
+  } /* else {
     display.value += key;
-  }
+  } */
 
   if (key === "Backspace") {
     display.value = display.value.slice(0, -1);
@@ -37,4 +40,13 @@ clearButton.addEventListener("click", () => {
 
 backspaceButton.addEventListener("click", () => {
   display.value = display.value.slice(0, -1);
+});
+
+calculateButton.addEventListener("click", () => {
+  const replaceX = display.value.replace("x", "*");
+  const replaceDivide = replaceX.replace("÷", "/");
+
+  const calculate = evaluateExpression(replaceDivide);
+
+  display.value = calculate;
 });

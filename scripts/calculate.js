@@ -62,7 +62,7 @@ function calculateOperators(expressionArr, operators, operationMap) {
   return expressionArr;
 }
 
-function evaluateExpression(expression) {
+export function evaluateExpression(expression) {
   const parsedArr = parseExpression(expression);
   const intermediateResult = calculateOperators(parsedArr, ["*", "/"], {
     "*": multiply,
@@ -77,7 +77,8 @@ function evaluateExpression(expression) {
   return finalResults[0];
 }
 
-console.log(evaluateExpression("3*6+12/2+4"));
+
+//console.log(evaluateExpression("3*6+12/2+4"));
 // console.log(calculateMultiplyAndDivide(["3", "*", "6", "+", "12", "/", "2", "-", "23"]));
 // console.log(calculateAddAndSubtract([ 18, '+', 6, "-", 23 ]))
 
