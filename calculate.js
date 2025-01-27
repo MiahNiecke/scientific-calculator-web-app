@@ -14,23 +14,24 @@ function divide(num1, num2) {
   return num1 / num2;
 }
 
+function isOperator(char) {
+  return ["*", "/", "+", "-"].includes(char);
+}
+
 function parseExpression(expression) {
   const parsedArr = [];
   const sanitizedExpression = expression.replace(/\s/g, "");
 
   for (let i = 0; i < sanitizedExpression.length; i++) {
     let part = sanitizedExpression[i];
-    if (part === "*" || part === "/" || part === "+" || part === "-") {
+    if (isOperator(part)) {
       parsedArr.push(part);
       continue;
     }
 
     i += 1;
     while (
-      sanitizedExpression[i] !== "*" &&
-      sanitizedExpression[i] !== "/" &&
-      sanitizedExpression[i] !== "+" &&
-      sanitizedExpression[i] !== "-" &&
+      !isOperator(sanitizedExpression[i]) &&
       i < sanitizedExpression.length
     ) {
       part += sanitizedExpression[i];
@@ -42,42 +43,6 @@ function parseExpression(expression) {
   }
 
   return parsedArr;
-}
-
-function calculateMultiplyAndDivide(expressionArr) {
-  if (expressionArr.includes("*" || expressionArr.includes("/"))) {
-    let i = 0;
-    while (i < expressionArr.length) {
-      if (expressionArr[i] === "*" || expressionArr[i] === "/") {
-        const newValue =
-          expressionArr[i] === "*"
-            ? multiply(expressionArr[i - 1], expressionArr[i + 1])
-            : divide(expressionArr[i - 1], expressionArr[i + 1]);
-        expressionArr.splice(i - 1, 3, newValue);
-        i -= 2;
-      }
-      i += 1;
-    }
-  }
-  return expressionArr;
-}
-
-function calculateAddAndSubtract(expressionArr) {
-  if (expressionArr.includes("+" || expressionArr.includes("-"))) {
-    let i = 0;
-    while (i < expressionArr.length) {
-      if (expressionArr[i] === "+" || expressionArr[i] === "-") {
-        const newValue =
-          expressionArr[i] === "+"
-            ? add(expressionArr[i - 1], expressionArr[i + 1])
-            : subtract(expressionArr[i - 1], expressionArr[i + 1]);
-        expressionArr.splice(i - 1, 3, newValue);
-        i -= 2;
-      }
-      i += 1;
-    }
-  }
-  return expressionArr;
 }
 
 function calculateOperators(expressionArr, operators, operationMap) {
@@ -97,27 +62,23 @@ function calculateOperators(expressionArr, operators, operationMap) {
   return expressionArr;
 }
 
-function smallCalculate(expression) {
-  const splitStr = parseExpression(expression);
-  const eliminateMultiplyAndDivide = calculateMultiplyAndDivide(
-    splitStr,
-    ["*", "/"],
-    {
-      "*": multiply,
-      "/": divide,
-    }
-  );
+function evaluateExpression(expression) {
+  const parsedArr = parseExpression(expression);
+  const intermediateResult = calculateOperators(parsedArr, ["*", "/"], {
+    "*": multiply,
+    "/": divide,
+  });
 
-  return calculateOperators(eliminateMultiplyAndDivide, ["+", "-"], {
+  const finalResults = calculateOperators(intermediateResult, ["+", "-"], {
     "+": add,
     "-": subtract,
-  })[0];
+  });
+
+  return finalResults[0];
 }
 
-console.log(smallCalculate("3*6+12/2+4"));
+console.log(evaluateExpression("3*6+12/2+4"));
 // console.log(calculateMultiplyAndDivide(["3", "*", "6", "+", "12", "/", "2", "-", "23"]));
 // console.log(calculateAddAndSubtract([ 18, '+', 6, "-", 23 ]))
 
 //console.log(splitExpression("3*6+ 1 2 /2"));
-
-// 3*6+2/2
