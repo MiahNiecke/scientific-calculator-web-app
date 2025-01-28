@@ -77,6 +77,9 @@ export function evaluateExpression(expression) {
   return finalResults[0];
 }
 
+function calculateFullExpression(expression) {
+  
+}
 
 //console.log(evaluateExpression("3*6+12/2+4"));
 // console.log(calculateMultiplyAndDivide(["3", "*", "6", "+", "12", "/", "2", "-", "23"]));
