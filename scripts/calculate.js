@@ -15,7 +15,40 @@ function divide(num1, num2) {
 }
 
 function isOperator(char) {
-  return ["*", "/", "+", "-"].includes(char);
+  return ["*", "/", "+", "-", "÷", "x"].includes(char);
+}
+
+function validateBrackets(expression) {
+  const stack = [];
+  
+  for (let i = 0; i < expression.length; i++) {
+    const char = expression[i];
+
+    if (char === "(") {
+      stack.push(char);
+    } else if (char === ")") {
+      if (stack.length === 0) {
+        return "Unmatched closing bracket at position " + i;
+      }
+      stack.pop();
+    }
+  }
+
+  if (stack.length > 0) {
+    return "Unmatched opening brackets in the expression.";
+  }
+
+  return true;
+}
+
+function validateExpression(expression) {
+  if (
+    isOperator(expression[0]) ||
+    isOperator(expression[expression.length - 1])
+  ) {
+    return "Mathematical expression cannot start or end with an operator";
+  }
+  return validateBrackets(expression);
 }
 
 function parseExpression(expression) {
@@ -63,6 +96,10 @@ function calculateOperators(expressionArr, operators, operationMap) {
 }
 
 export function evaluateExpression(expression) {
+  const error = validateExpression(expression);
+  if (error !== true) {
+    return error;
+  }
   const parsedArr = parseExpression(expression);
   const intermediateResult = calculateOperators(parsedArr, ["*", "/"], {
     "*": multiply,
@@ -74,12 +111,10 @@ export function evaluateExpression(expression) {
     "-": subtract,
   });
 
-  return finalResults[0];
+  return Number(finalResults[0]);
 }
 
-function calculateFullExpression(expression) {
-  
-}
+function calculateFullExpression(expression) {}
 
 //console.log(evaluateExpression("3*6+12/2+4"));
 // console.log(calculateMultiplyAndDivide(["3", "*", "6", "+", "12", "/", "2", "-", "23"]));

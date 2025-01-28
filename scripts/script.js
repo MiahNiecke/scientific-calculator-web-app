@@ -5,6 +5,7 @@ const buttons = document.querySelectorAll(".buttons button");
 const clearButton = document.getElementById("clear-button");
 const backspaceButton = document.getElementById("backspace");
 const calculateButton = document.getElementById("calculate");
+const errorMessage = document.getElementById("error-message");
 
 function isValidInput(value) {
   const validChars = /^[0-9+\-x÷().]$/;
@@ -16,8 +17,10 @@ function performCalculations() {
   const replaceDivide = replaceX.replace("÷", "/");
 
   const calculate = evaluateExpression(replaceDivide);
-
-  display.value = calculate;
+  if (typeof calculate !== "number") errorMessage.textContent = calculate;
+  else if (typeof calculate === NaN)
+    errorMessage.textContent = "Something went wrong with the expression";
+  else display.value = calculate;
 }
 
 buttons.forEach((button) => {
