@@ -28,7 +28,6 @@ export function isValidToReplace(value) {
   return validChars.test(value);
 }
 
-
 function validateBrackets(expression) {
   const stack = [];
 
@@ -52,20 +51,14 @@ function validateBrackets(expression) {
   return true;
 }
 
-function validateExpression(expression) {
-  if (isOperator(expression[expression.length - 1])) {
-    return "Mathematical expression cannot end with an operator";
-  }
-  return validateBrackets(expression);
-}
-
 function parseExpression(expression) {
   const parsedArr = [];
   const sanitizedExpression = expression.replace(/\s/g, "");
 
   for (let i = 0; i < sanitizedExpression.length; i++) {
     let part = sanitizedExpression[i];
-    if (isOperator(part)) {
+
+    if (isOperator(part) && !isOperator(sanitizedExpression[i - 1])) {
       parsedArr.push(part);
       continue;
     }
@@ -81,6 +74,10 @@ function parseExpression(expression) {
 
     parsedArr.push(Number(part));
     if (i < sanitizedExpression.length) i -= 1;
+  }
+
+  while (isOperator(parsedArr[parsedArr.length - 1])) {
+    parsedArr.pop();
   }
 
   return parsedArr;
@@ -104,7 +101,7 @@ function calculateOperators(expressionArr, operators, operationMap) {
 }
 
 export function evaluateExpression(expression) {
-  const error = validateExpression(expression);
+  const error = validateBrackets(expression);
   if (error !== true) {
     return error;
   }
@@ -129,3 +126,4 @@ function calculateFullExpression(expression) {}
 // console.log(calculateAddAndSubtract([ 18, '+', 6, "-", 23 ]))
 
 //console.log(splitExpression("3*6+ 1 2 /2"));
+//console.log(parseExpression("3*-6"))
