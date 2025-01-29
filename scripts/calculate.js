@@ -14,13 +14,24 @@ function divide(num1, num2) {
   return num1 / num2;
 }
 
-function isOperator(char) {
+export function isOperator(char) {
   return ["*", "/", "+", "-", "÷", "x"].includes(char);
 }
 
+export function isValidInput(value) {
+  const validChars = /^[0-9+\-x÷().]$/;
+  return validChars.test(value);
+}
+
+export function isValidToReplace(value) {
+  const validChars = /^[0-9-(]$/;
+  return validChars.test(value);
+}
+
+
 function validateBrackets(expression) {
   const stack = [];
-  
+
   for (let i = 0; i < expression.length; i++) {
     const char = expression[i];
 
@@ -42,11 +53,8 @@ function validateBrackets(expression) {
 }
 
 function validateExpression(expression) {
-  if (
-    isOperator(expression[0]) ||
-    isOperator(expression[expression.length - 1])
-  ) {
-    return "Mathematical expression cannot start or end with an operator";
+  if (isOperator(expression[expression.length - 1])) {
+    return "Mathematical expression cannot end with an operator";
   }
   return validateBrackets(expression);
 }
