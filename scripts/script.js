@@ -11,12 +11,14 @@ display.value = 0;
 const buttons = document.querySelectorAll(
   ".buttons button:not(#backspace):not(#clear-button):not(#calculate)"
 );
-const advanceButtons = document.querySelectorAll(".advance-buttons button");
+//const advanceButtons = document.querySelectorAll(".advance-buttons button");
 const clearButton = document.getElementById("clear-button");
 const backspaceButton = document.getElementById("backspace");
 const calculateButton = document.getElementById("calculate");
 const errorMessage = document.getElementById("error-message");
 const piButton = document.getElementById("pi");
+const sqrtButton = document.getElementById("sqrt");
+const expButton = document.getElementById("exp");
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -71,9 +73,24 @@ function validateAndAppendKey(previous, keyToAdd) {
   }
 
   if (
+    (previous === ")" && /[0-9]/.test(keyToAdd)) ||
+    (!isOperator(previous) && keyToAdd === "√(")
+  ) {
+    return;
+  }
+
+  if (
     (previous === "(" && keyToAdd === ")") ||
     (previous === "." && keyToAdd === ".")
   ) {
+    return;
+  }
+
+  if (keyToAdd === "^" && !/[0-9]/.test(previous)) {
+    return;
+  }
+
+  if (previous === "^" && !/[0-9]/.test(keyToAdd)) {
     return;
   }
 
@@ -129,4 +146,16 @@ piButton.addEventListener("click", () => {
   errorMessage.textContent = "";
   const previousValue = display.value[display.value.length - 1];
   validateAndAppendKey(previousValue, "π");
+});
+
+sqrtButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "√(");
+});
+
+expButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "^");
 });
