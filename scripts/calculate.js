@@ -57,8 +57,11 @@ function parseExpression(expression) {
 
   for (let i = 0; i < sanitizedExpression.length; i++) {
     let part = sanitizedExpression[i];
-
-    if (isOperator(part) && !isOperator(sanitizedExpression[i - 1])) {
+    if (
+      isOperator(part) &&
+      i !== 0 &&
+      !isOperator(sanitizedExpression[i - 1])
+    ) {
       parsedArr.push(part);
       continue;
     }
@@ -83,6 +86,12 @@ function parseExpression(expression) {
   return parsedArr;
 }
 
+function addMultiply(expression) {
+  let modifiedExpression = expression.replaceAll(/(\d)(\()/g, "$1*$2");
+  modifiedExpression = modifiedExpression.replace(/(\))(\()/g, "$1*$2");
+  return modifiedExpression;
+}
+
 function calculateOperators(expressionArr, operators, operationMap) {
   let i = 0;
   while (i < expressionArr.length) {
@@ -101,10 +110,6 @@ function calculateOperators(expressionArr, operators, operationMap) {
 }
 
 export function evaluateExpression(expression) {
-  const error = validateBrackets(expression);
-  if (error !== true) {
-    return error;
-  }
   const parsedArr = parseExpression(expression);
   const intermediateResult = calculateOperators(parsedArr, ["*", "/"], {
     "*": multiply,
@@ -119,11 +124,33 @@ export function evaluateExpression(expression) {
   return Number(finalResults[0]);
 }
 
-function calculateFullExpression(expression) {}
+export function calculateFullExpression(expression) {
+  const error = validateBrackets(expression);
+  if (error !== true) {
+    return error;
+  }
+  const addedMultiply = addMultiply(expression);
+
+  let innermostParentheses = /\(([^()]+)\)/g;
+  let updatedExpression = addedMultiply;
+  while (innermostParentheses.test(updatedExpression)) {
+    updatedExpression = updatedExpression.replace(
+      innermostParentheses,
+      (match, inside) => {
+        const evaluatedResult = evaluateExpression(inside);
+        return evaluatedResult;
+      }
+    );
+  }
+  return evaluateExpression(updatedExpression);
+}
 
 //console.log(evaluateExpression("3*6+12/2+4"));
 // console.log(calculateMultiplyAndDivide(["3", "*", "6", "+", "12", "/", "2", "-", "23"]));
 // console.log(calculateAddAndSubtract([ 18, '+', 6, "-", 23 ]))
 
 //console.log(splitExpression("3*6+ 1 2 /2"));
-//console.log(parseExpression("3*-6"))
+//console.log(parseExpression("-3*-6"))
+
+//console.log(calculateFullExpression("3(3+6(-7)+9)(3+7)"));
+//console.log(parseExpression("-3*-7"));

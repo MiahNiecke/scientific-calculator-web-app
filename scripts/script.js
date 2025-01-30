@@ -1,4 +1,10 @@
-import { evaluateExpression, isOperator, isValidInput, isValidToReplace } from "./calculate.js";
+import {
+  calculateFullExpression,
+  evaluateExpression,
+  isOperator,
+  isValidInput,
+  isValidToReplace,
+} from "./calculate.js";
 
 const display = document.getElementById("display");
 display.value = 0;
@@ -22,7 +28,7 @@ function performCalculations() {
   const replaceX = display.value.replace("x", "*");
   const replaceDivide = replaceX.replace("÷", "/");
 
-  const calculate = evaluateExpression(replaceDivide);
+  const calculate = calculateFullExpression(replaceDivide);
 
   if (typeof calculate !== "number") displayError(calculate);
   else if (Number.isNaN(calculate))
@@ -33,7 +39,7 @@ function performCalculations() {
 function validateAndAppendKey(previous, keyToAdd) {
   const secondLastChar = display.value[display.value.length - 2];
 
-   if (display.value === "0" && isValidToReplace(keyToAdd)) {
+  if (display.value === "0" && isValidToReplace(keyToAdd)) {
     display.value = keyToAdd;
     return;
   }
@@ -42,7 +48,10 @@ function validateAndAppendKey(previous, keyToAdd) {
     return;
   }
 
-  if (display.value === "-" && (!isValidToReplace(keyToAdd) || keyToAdd === "." || keyToAdd === "-")) {
+  if (
+    display.value === "-" &&
+    (!isValidToReplace(keyToAdd) || keyToAdd === "." || keyToAdd === "-")
+  ) {
     return;
   }
 
@@ -60,13 +69,15 @@ function validateAndAppendKey(previous, keyToAdd) {
     return;
   }
 
-  if ((previous === "(" && keyToAdd === ")") || (previous === "." && keyToAdd === ".")) {
+  if (
+    (previous === "(" && keyToAdd === ")") ||
+    (previous === "." && keyToAdd === ".")
+  ) {
     return;
   }
 
   display.value += keyToAdd;
 }
-
 
 buttons.forEach((button) => {
   button.addEventListener("click", () => {
