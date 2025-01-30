@@ -115,16 +115,18 @@ function replaceSquareRoot(expression) {
       return `(Math.sqrt(${replacedInner}))`;
     });
   }
-  console.log(replacedExpression);
+  //console.log(replacedExpression);
   return replacedExpression;
 }
 
 function eliminateAllExponents(arr) {
+  console.log(arr);
   for (let i = 0; i < arr.length; i++) {
-    if (arr[i].includes("^")) {
+    if (arr[i].toString().includes("^")) {
       arr[i] = exponent(arr[i]);
     }
   }
+  //console.log(arr)
   return arr;
 }
 
@@ -161,6 +163,7 @@ export function evaluateExpression(expression) {
     "+": add,
     "-": subtract,
   });
+  //console.log(finalResults[0])
   return Number(finalResults[0]);
 }
 
