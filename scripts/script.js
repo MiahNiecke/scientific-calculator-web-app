@@ -1,6 +1,5 @@
 import {
   calculateFullExpression,
-  evaluateExpression,
   isOperator,
   isValidInput,
   isValidToReplace,
@@ -12,10 +11,12 @@ display.value = 0;
 const buttons = document.querySelectorAll(
   ".buttons button:not(#backspace):not(#clear-button):not(#calculate)"
 );
+const advanceButtons = document.querySelectorAll(".advance-buttons button");
 const clearButton = document.getElementById("clear-button");
 const backspaceButton = document.getElementById("backspace");
 const calculateButton = document.getElementById("calculate");
 const errorMessage = document.getElementById("error-message");
+const piButton = document.getElementById("pi");
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -122,4 +123,10 @@ backspaceButton.addEventListener("click", () => {
 
 calculateButton.addEventListener("click", () => {
   performCalculations();
+});
+
+piButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "π");
 });

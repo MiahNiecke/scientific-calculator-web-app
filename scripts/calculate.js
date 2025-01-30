@@ -14,6 +14,10 @@ function divide(num1, num2) {
   return num1 / num2;
 }
 
+/* function sqrt(num) {
+  if (num)
+} */
+
 export function isOperator(char) {
   return ["*", "/", "+", "-", "÷", "x"].includes(char);
 }
@@ -24,7 +28,7 @@ export function isValidInput(value) {
 }
 
 export function isValidToReplace(value) {
-  const validChars = /^[0-9-(]$/;
+  const validChars = /^[0-9-(π]$/;
   return validChars.test(value);
 }
 
@@ -86,6 +90,10 @@ function parseExpression(expression) {
   return parsedArr;
 }
 
+function replacePi(expression) {
+  return expression.replaceAll(/π/g,`(${Math.PI.toString()})`);
+}
+
 function addMultiply(expression) {
   let modifiedExpression = expression.replaceAll(/(\d)(\()/g, "$1*$2");
   modifiedExpression = modifiedExpression.replace(/(\))(\()/g, "$1*$2");
@@ -129,7 +137,8 @@ export function calculateFullExpression(expression) {
   if (error !== true) {
     return error;
   }
-  const addedMultiply = addMultiply(expression);
+  const replacePI = replacePi(expression);
+  const addedMultiply = addMultiply(replacePI);
 
   let innermostParentheses = /\(([^()]+)\)/g;
   let updatedExpression = addedMultiply;

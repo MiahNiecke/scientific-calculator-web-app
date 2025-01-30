@@ -68,3 +68,20 @@ input:focus {
 #backspace:hover {
     background-color: rgb(83, 110, 129);
 }
+
+.advanced-buttons {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.advance {
+    font-size: 16px;
+    padding: 4px 6px;
+    background-color: #00A7A7;
+}
+
+.advance:hover {
+    background-color: #008F8F
+}
