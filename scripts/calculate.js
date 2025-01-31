@@ -31,6 +31,18 @@ function logBase10(expression) {
   return expression;
 }
 
+function lnCalculate(expression) {
+  let regex = /Math.log([^()]+)/g;
+
+  while (regex.test(expression)) {
+    expression = expression.replace(regex, (match, p1) => {
+      return `${Math.log(Number(p1))}`;
+    });
+  }
+  //console.log(expression)
+  return expression;
+}
+
 export function isOperator(char) {
   return ["*", "/", "+", "-", "÷", "x"].includes(char);
 }
@@ -155,6 +167,21 @@ function replaceLog10(expression) {
   return replacedExpression;
 }
 
+function replaceln(expression) {
+  let regex = /ln\(([^)]+)\)/g;
+
+  let replacedExpression = expression;
+
+  while (replacedExpression.match(regex)) {
+    replacedExpression = replacedExpression.replaceAll(regex, (match, p1) => {
+      let replacedInner = replaceSquareRoot(p1);
+      return `(Math.log(${replacedInner}))`;
+    });
+  }
+  //console.log(replacedExpression);
+  return replacedExpression;
+}
+
 function calculateOperators(expressionArr, operators, operationMap) {
   let i = 0;
   while (i < expressionArr.length) {
@@ -178,7 +205,8 @@ export function evaluateExpression(expression) {
   );
 
   expression = logBase10(expression);
-  console.log(expression);
+  //console.log(expression);
+  expression = lnCalculate(expression);
 
   const parsedArr = parseExpression(expression);
   const exponentResults = eliminateAllExponents(parsedArr);
@@ -206,8 +234,9 @@ export function calculateFullExpression(expression) {
   const replaceSquare = replaceSquareRoot(replacePI);
   //console.log(replaceSquare);
   const replaceLogs = replaceLog10(replaceSquare);
+  const replaceLn = replaceln(replaceLogs);
 
-  const addedMultiply = addMultiply(replaceLogs);
+  const addedMultiply = addMultiply(replaceLn);
   //console.log(addedMultiply);
 
   let innermostParentheses = /\(([^()]+)\)/g;

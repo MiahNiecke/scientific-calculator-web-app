@@ -20,6 +20,7 @@ const piButton = document.getElementById("pi");
 const sqrtButton = document.getElementById("sqrt");
 const expButton = document.getElementById("exp");
 const logButton = document.getElementById("log");
+const lnButton = document.getElementById("ln");
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -95,6 +96,9 @@ function validateAndAppendKey(previous, keyToAdd) {
     return;
   }
 
+  if (/[0-9]/.test(previous) && (keyToAdd === "log10(" || keyToAdd === "ln(")) {
+    return;
+  }
   display.value += keyToAdd;
 }
 
@@ -182,4 +186,10 @@ logButton.addEventListener("click", () => {
   errorMessage.textContent = "";
   const previousValue = display.value[display.value.length - 1];
   validateAndAppendKey(previousValue, "log10(");
+});
+
+lnButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "ln(");
 });
