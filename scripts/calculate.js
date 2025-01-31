@@ -43,6 +43,15 @@ function lnCalculate(expression) {
   return expression;
 }
 
+function factorial(n) {
+  let result = 1;
+  for (let i = 1; i <= n; i++) {
+    result *= i;
+  }
+
+  return result;
+}
+
 export function isOperator(char) {
   return ["*", "/", "+", "-", "÷", "x"].includes(char);
 }
@@ -182,6 +191,13 @@ function replaceln(expression) {
   return replacedExpression;
 }
 
+function wrapFactorial(expression) {
+  let modifiedExpression = expression.replace(/(\d+)!/g, "($1!)");
+  modifiedExpression = modifiedExpression.replace(/\(([^()]+)\)!/g, "(($1)!)");
+
+  return modifiedExpression;
+}
+
 function calculateOperators(expressionArr, operators, operationMap) {
   let i = 0;
   while (i < expressionArr.length) {
@@ -203,10 +219,12 @@ export function evaluateExpression(expression) {
   expression = expression.replace(/Math\.sqrt\(?([\d.]+)\)?/g, (_, num) =>
     Math.sqrt(Number(num))
   );
+  expression = expression.replace(/(\d+)!/, (_, num) => factorial(Number(num)));
 
   expression = logBase10(expression);
-  //console.log(expression);
+
   expression = lnCalculate(expression);
+  console.log(expression);
 
   const parsedArr = parseExpression(expression);
   const exponentResults = eliminateAllExponents(parsedArr);
@@ -235,8 +253,9 @@ export function calculateFullExpression(expression) {
   //console.log(replaceSquare);
   const replaceLogs = replaceLog10(replaceSquare);
   const replaceLn = replaceln(replaceLogs);
+  const wrappedFactorial = wrapFactorial(replaceLn);
 
-  const addedMultiply = addMultiply(replaceLn);
+  const addedMultiply = addMultiply(wrappedFactorial);
   //console.log(addedMultiply);
 
   let innermostParentheses = /\(([^()]+)\)/g;

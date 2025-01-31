@@ -21,6 +21,7 @@ const sqrtButton = document.getElementById("sqrt");
 const expButton = document.getElementById("exp");
 const logButton = document.getElementById("log");
 const lnButton = document.getElementById("ln");
+const factorialButton = document.getElementById("factorial");
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -99,6 +100,9 @@ function validateAndAppendKey(previous, keyToAdd) {
   if (/[0-9]/.test(previous) && (keyToAdd === "log10(" || keyToAdd === "ln(")) {
     return;
   }
+
+  if ((isOperator(previous) || previous === "!") && keyToAdd === "!") return;
+
   display.value += keyToAdd;
 }
 
@@ -192,4 +196,10 @@ lnButton.addEventListener("click", () => {
   errorMessage.textContent = "";
   const previousValue = display.value[display.value.length - 1];
   validateAndAppendKey(previousValue, "ln(");
+});
+
+factorialButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "!");
 });
