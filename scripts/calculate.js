@@ -16,8 +16,19 @@ function divide(num1, num2) {
 
 function exponent(expression) {
   const parts = expression.split("^");
-  console.log(Math.pow(Number(parts[0]), Number(parts[1])));
   return Math.pow(Number(parts[0]), Number(parts[1]));
+}
+
+function logBase10(expression) {
+  let regex = /base10([^()]+)/g;
+
+  while (regex.test(expression)) {
+    expression = expression.replace(regex, (match, p1) => {
+      return `${Math.log10(Number(p1))}`;
+    });
+  }
+  //console.log(expression)
+  return expression;
 }
 
 export function isOperator(char) {
@@ -30,7 +41,7 @@ export function isValidInput(value) {
 }
 
 export function isValidToReplace(value) {
-  const validChars = /^[0-9-(π]$/;
+  const validChars = /(?:[0-9-(π]|log10\()$/;
   return validChars.test(value) || value === "√(";
 }
 
@@ -101,7 +112,7 @@ function replacePi(expression) {
 function addMultiply(expression) {
   let modifiedExpression = expression.replaceAll(/(\d)(\()/g, "$1*$2");
   modifiedExpression = modifiedExpression.replace(/(\))(\()/g, "$1*$2");
-  return modifiedExpression;
+  return modifiedExpression.replace(/base10\*\(/g, "base10(");
 }
 
 function replaceSquareRoot(expression) {
@@ -120,7 +131,6 @@ function replaceSquareRoot(expression) {
 }
 
 function eliminateAllExponents(arr) {
-  console.log(arr);
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].toString().includes("^")) {
       arr[i] = exponent(arr[i]);
@@ -128,6 +138,21 @@ function eliminateAllExponents(arr) {
   }
   //console.log(arr)
   return arr;
+}
+
+function replaceLog10(expression) {
+  let regex = /log10\(([^)]+)\)/g;
+
+  let replacedExpression = expression;
+
+  while (replacedExpression.match(regex)) {
+    replacedExpression = replacedExpression.replaceAll(regex, (match, p1) => {
+      let replacedInner = replaceLog10(p1);
+      return `(base10(${replacedInner}))`;
+    });
+  }
+  //console.log(replacedExpression);
+  return replacedExpression;
 }
 
 function calculateOperators(expressionArr, operators, operationMap) {
@@ -151,6 +176,10 @@ export function evaluateExpression(expression) {
   expression = expression.replace(/Math\.sqrt\(?([\d.]+)\)?/g, (_, num) =>
     Math.sqrt(Number(num))
   );
+
+  expression = logBase10(expression);
+  console.log(expression);
+
   const parsedArr = parseExpression(expression);
   const exponentResults = eliminateAllExponents(parsedArr);
 
@@ -163,7 +192,6 @@ export function evaluateExpression(expression) {
     "+": add,
     "-": subtract,
   });
-  //console.log(finalResults[0])
   return Number(finalResults[0]);
 }
 
@@ -172,11 +200,14 @@ export function calculateFullExpression(expression) {
   if (error !== true) {
     return error;
   }
+  //console.log(expression)
   const replacePI = replacePi(expression);
   //console.log(replacePI);
   const replaceSquare = replaceSquareRoot(replacePI);
   //console.log(replaceSquare);
-  const addedMultiply = addMultiply(replaceSquare);
+  const replaceLogs = replaceLog10(replaceSquare);
+
+  const addedMultiply = addMultiply(replaceLogs);
   //console.log(addedMultiply);
 
   let innermostParentheses = /\(([^()]+)\)/g;

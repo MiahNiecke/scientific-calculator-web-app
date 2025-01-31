@@ -19,6 +19,7 @@ const errorMessage = document.getElementById("error-message");
 const piButton = document.getElementById("pi");
 const sqrtButton = document.getElementById("sqrt");
 const expButton = document.getElementById("exp");
+const logButton = document.getElementById("log");
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -74,7 +75,7 @@ function validateAndAppendKey(previous, keyToAdd) {
 
   if (
     (previous === ")" && /[0-9]/.test(keyToAdd)) ||
-    (!isOperator(previous) && keyToAdd === "√(")
+    (!isOperator(previous) && previous !== "(" && keyToAdd === "√(")
   ) {
     return;
   }
@@ -86,7 +87,7 @@ function validateAndAppendKey(previous, keyToAdd) {
     return;
   }
 
-  if (keyToAdd === "^" && !/[0-9]/.test(previous)) {
+  if (keyToAdd === "^" && !/[0-9]/.test(previous) && previous !== ")") {
     return;
   }
 
@@ -120,7 +121,15 @@ document.addEventListener("keydown", (event) => {
   }
 
   if (key === "Backspace") {
-    display.value = display.value.slice(0, -1);
+    const secondLastChar = display.value[display.value.length - 2];
+    if (
+      previousValue === "(" &&
+      !/[0-9]/.test(secondLastChar) &&
+      !isOperator(secondLastChar)
+    ) {
+      display.value = display.value.slice(0, -2);
+    } else display.value = display.value.slice(0, -1);
+
     if (display.value === "") display.value = 0;
   }
 
@@ -134,7 +143,16 @@ clearButton.addEventListener("click", () => {
 });
 
 backspaceButton.addEventListener("click", () => {
-  display.value = display.value.slice(0, -1);
+  const previousValue = display.value[display.value.length - 1];
+  const secondLastChar = display.value[display.value.length - 2];
+  if (
+    previousValue === "(" &&
+    !/[0-9]/.test(secondLastChar) &&
+    !isOperator(secondLastChar)
+  ) {
+    display.value = display.value.slice(0, -2);
+  } else display.value = display.value.slice(0, -1);
+
   if (display.value === "") display.value = 0;
 });
 
@@ -158,4 +176,10 @@ expButton.addEventListener("click", () => {
   errorMessage.textContent = "";
   const previousValue = display.value[display.value.length - 1];
   validateAndAppendKey(previousValue, "^");
+});
+
+logButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "log10(");
 });
