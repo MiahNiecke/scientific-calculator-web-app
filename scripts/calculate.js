@@ -27,7 +27,6 @@ function logBase10(expression) {
       return `${Math.log10(Number(p1))}`;
     });
   }
-  //console.log(expression)
   return expression;
 }
 
@@ -39,7 +38,6 @@ function lnCalculate(expression) {
       return `${Math.log(Number(p1))}`;
     });
   }
-  //console.log(expression)
   return expression;
 }
 
@@ -50,6 +48,46 @@ function factorial(n) {
   }
 
   return result;
+}
+
+function calculateTrig(expression) {
+  const regexFnObj = {
+    sinRegex: {
+      regex: /sinTrig\(?(-?\d+(\.\d+)?)\)?/g,
+      fn: (_, num) => Math.sin(parseFloat(num)),
+    },
+    cosRegex: {
+      regex: /cosTrig\(?(-?\d+(\.\d+)?)\)?/g,
+      fn: (_, num) => Math.cos(parseFloat(num)),
+    },
+    tanRegex: {
+      regex: /tanTrig\(?(-?\d+(\.\d+)?)\)?/g,
+      fn: (_, num) => Math.tan(parseFloat(num)),
+    },
+    asinRegex: {
+      regex: /sin⁻¹Trig\(?(-?\d+(\.\d+)?)\)?/g,
+      fn: (_, num) => Math.asin(parseFloat(num)),
+    },
+    acosRegex: {
+      regex: /cos⁻¹Trig\(?(-?\d+(\.\d+)?)\)?/g,
+      fn: (_, num) => Math.acos(parseFloat(num)),
+    },
+    atanRegex: {
+      regex: /tan⁻¹Trig\(?(-?\d+(\.\d+)?)\)?/g,
+      fn: (_, num) => Math.atan(parseFloat(num)),
+    },
+  };
+  let prevExpression;
+  let newExpression = expression;
+
+  do {
+    prevExpression = newExpression;
+    for (const key in regexFnObj) {
+      const { regex, fn } = regexFnObj[key];
+      newExpression = newExpression.replace(regex, fn);
+    }
+  } while (prevExpression !== newExpression);
+  return newExpression;
 }
 
 export function isOperator(char) {
@@ -147,7 +185,6 @@ function replaceSquareRoot(expression) {
       return `(Math.sqrt(${replacedInner}))`;
     });
   }
-  //console.log(replacedExpression);
   return replacedExpression;
 }
 
@@ -157,7 +194,6 @@ function eliminateAllExponents(arr) {
       arr[i] = exponent(arr[i]);
     }
   }
-  //console.log(arr)
   return arr;
 }
 
@@ -172,7 +208,6 @@ function replaceLog10(expression) {
       return `(base10(${replacedInner}))`;
     });
   }
-  //console.log(replacedExpression);
   return replacedExpression;
 }
 
@@ -187,7 +222,6 @@ function replaceln(expression) {
       return `(Math.log(${replacedInner}))`;
     });
   }
-  //console.log(replacedExpression);
   return replacedExpression;
 }
 
@@ -196,6 +230,33 @@ function wrapFactorial(expression) {
   modifiedExpression = modifiedExpression.replace(/\(([^()]+)\)!/g, "(($1)!)");
 
   return modifiedExpression;
+}
+
+function wrapTrigFn(expression) {
+  const regexObj = {
+    sinRegex: /(sin)(\([^)]*\)|[0-9]+)/g,
+    cosRegex: /(cos)(\([^)]*\)|[0-9]+)/g,
+    tanRegex: /(tan)(\([^)]*\)|[0-9]+)/g,
+    asinRegex: /(sin⁻¹)(\([^)]*\)|[0-9]+)/g,
+    acosRegex: /(cos⁻¹)(\([^)]*\)|[0-9]+)/g,
+    atanRegex: /(tan⁻¹)(\([^)]*\)|[0-9]+)/g,
+  };
+
+  let prevExpression;
+  let newExpression = expression;
+
+  do {
+    prevExpression = newExpression;
+
+    for (const key in regexObj) {
+      const regex = regexObj[key];
+      newExpression = newExpression.replace(regex, (match, func, args) => {
+        return `(${func}Trig${args})`;
+      });
+    }
+  } while (prevExpression !== newExpression);
+
+  return newExpression;
 }
 
 function calculateOperators(expressionArr, operators, operationMap) {
@@ -224,7 +285,7 @@ export function evaluateExpression(expression) {
   expression = logBase10(expression);
 
   expression = lnCalculate(expression);
-  console.log(expression);
+  expression = calculateTrig(expression);
 
   const parsedArr = parseExpression(expression);
   const exponentResults = eliminateAllExponents(parsedArr);
@@ -246,22 +307,17 @@ export function calculateFullExpression(expression) {
   if (error !== true) {
     return error;
   }
-  //console.log(expression)
   const replacePI = replacePi(expression);
-  //console.log(replacePI);
   const replaceSquare = replaceSquareRoot(replacePI);
-  //console.log(replaceSquare);
   const replaceLogs = replaceLog10(replaceSquare);
   const replaceLn = replaceln(replaceLogs);
   const wrappedFactorial = wrapFactorial(replaceLn);
-
-  const addedMultiply = addMultiply(wrappedFactorial);
-  //console.log(addedMultiply);
+  const wrappedTrig = wrapTrigFn(wrappedFactorial);
+  const addedMultiply = addMultiply(wrappedTrig);
 
   let innermostParentheses = /\(([^()]+)\)/g;
   let updatedExpression = addedMultiply;
   while (innermostParentheses.test(updatedExpression)) {
-    //console.log(updatedExpression)
     updatedExpression = updatedExpression.replace(
       innermostParentheses,
       (match, inside) => {
@@ -269,17 +325,6 @@ export function calculateFullExpression(expression) {
         return evaluatedResult;
       }
     );
-    //console.log(updatedExpression);
   }
   return evaluateExpression(updatedExpression);
 }
-
-//console.log(evaluateExpression("3*6+12/2+4"));
-// console.log(calculateMultiplyAndDivide(["3", "*", "6", "+", "12", "/", "2", "-", "23"]));
-// console.log(calculateAddAndSubtract([ 18, '+', 6, "-", 23 ]))
-
-//console.log(splitExpression("3*6+ 1 2 /2"));
-//console.log(parseExpression("-3*-6"))
-
-//console.log(calculateFullExpression("3(3+6(-7)+9)(3+7)"));
-//console.log(parseExpression("-3*-7"));

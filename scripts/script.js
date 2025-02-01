@@ -22,6 +22,12 @@ const expButton = document.getElementById("exp");
 const logButton = document.getElementById("log");
 const lnButton = document.getElementById("ln");
 const factorialButton = document.getElementById("factorial");
+const sinButton = document.getElementById("sin");
+const cosButton = document.getElementById("cos");
+const tanButton = document.getElementById("tan");
+const asinButton = document.getElementById("asin");
+const acosButton = document.getElementById("acos");
+const atanButton = document.getElementById("atan");
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -202,4 +208,40 @@ factorialButton.addEventListener("click", () => {
   errorMessage.textContent = "";
   const previousValue = display.value[display.value.length - 1];
   validateAndAppendKey(previousValue, "!");
+});
+
+sinButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "sin(");
+});
+
+cosButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "cos(");
+});
+
+tanButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "tan(");
+});
+
+asinButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "sin⁻¹(");
+});
+
+acosButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "cos⁻¹(");
+});
+
+atanButton.addEventListener("click", () => {
+  errorMessage.textContent = "";
+  const previousValue = display.value[display.value.length - 1];
+  validateAndAppendKey(previousValue, "tan⁻¹(");
 });
