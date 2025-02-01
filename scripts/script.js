@@ -11,23 +11,25 @@ display.value = 0;
 const buttons = document.querySelectorAll(
   ".buttons button:not(#backspace):not(#clear-button):not(#calculate)"
 );
-//const advanceButtons = document.querySelectorAll(".advance-buttons button");
 const clearButton = document.getElementById("clear-button");
 const backspaceButton = document.getElementById("backspace");
 const calculateButton = document.getElementById("calculate");
 const errorMessage = document.getElementById("error-message");
-const piButton = document.getElementById("pi");
-const sqrtButton = document.getElementById("sqrt");
-const expButton = document.getElementById("exp");
-const logButton = document.getElementById("log");
-const lnButton = document.getElementById("ln");
-const factorialButton = document.getElementById("factorial");
-const sinButton = document.getElementById("sin");
-const cosButton = document.getElementById("cos");
-const tanButton = document.getElementById("tan");
-const asinButton = document.getElementById("asin");
-const acosButton = document.getElementById("acos");
-const atanButton = document.getElementById("atan");
+
+const advancedButtons = {
+  pi: "π",
+  sqrt: "√(",
+  exp: "^",
+  log: "log10(",
+  ln: "ln(",
+  factorial: "!",
+  sin: "sin(",
+  cos: "cos(",
+  tan: "tan(",
+  asin: "sin⁻¹(",
+  acos: "cos⁻¹(",
+  atan: "tan⁻¹(",
+};
 
 function displayError(error) {
   errorMessage.textContent = error;
@@ -37,15 +39,16 @@ function displayError(error) {
 }
 
 function performCalculations() {
-  const replaceX = display.value.replace("x", "*");
-  const replaceDivide = replaceX.replace("÷", "/");
+  const sanitizedInput = display.value.replace("x", "*").replace("÷", "/");
+  const result = calculateFullExpression(sanitizedInput);
 
-  const calculate = calculateFullExpression(replaceDivide);
-
-  if (typeof calculate !== "number") displayError(calculate);
-  else if (Number.isNaN(calculate))
+  if (typeof result !== "number") {
+    displayError(result);
+  } else if (Number.isNaN(result)) {
     displayError("Something went wrong with the calculation");
-  else display.value = calculate;
+  } else {
+    display.value = result;
+  }
 }
 
 function validateAndAppendKey(previous, keyToAdd) {
@@ -56,56 +59,45 @@ function validateAndAppendKey(previous, keyToAdd) {
     return;
   }
 
-  if (isOperator(secondLastChar) && previous === "-" && isOperator(keyToAdd)) {
+  if (isOperator(secondLastChar) && previous === "-" && isOperator(keyToAdd))
     return;
-  }
-
-  if (
-    display.value === "-" &&
-    (!isValidToReplace(keyToAdd) || keyToAdd === "." || keyToAdd === "-")
-  ) {
-    return;
-  }
-
   if (isOperator(previous) && keyToAdd !== "-" && isOperator(keyToAdd)) {
     display.value = display.value.slice(0, -1) + keyToAdd;
     return;
   }
 
-  if (previous === "+" && keyToAdd === "-") {
+  if (display.value === "-" || (previous === "+" && keyToAdd === "-")) {
+    if (!isValidToReplace(keyToAdd) || keyToAdd === "." || keyToAdd === "-")
+      return;
     display.value = display.value.slice(0, -1) + keyToAdd;
     return;
   }
 
-  if ((isOperator(previous) || /^[()]$/.test(previous)) && keyToAdd === ".") {
+  if ((isOperator(previous) || /^[()]$/.test(previous)) && keyToAdd === ".")
     return;
-  }
 
+  const invalidFunctionCalls = [
+    "log10(",
+    "ln(",
+    "sin(",
+    "cos(",
+    "tan(",
+    "sin⁻¹(",
+    "cos⁻¹(",
+    "tan⁻¹(",
+  ];
   if (
     (previous === ")" && /[0-9]/.test(keyToAdd)) ||
-    (!isOperator(previous) && previous !== "(" && keyToAdd === "√(")
-  ) {
-    return;
-  }
-
-  if (
+    (!isOperator(previous) && previous !== "(" && keyToAdd === "√(") ||
+    invalidFunctionCalls.includes(keyToAdd) ||
     (previous === "(" && keyToAdd === ")") ||
     (previous === "." && keyToAdd === ".")
   ) {
     return;
   }
 
-  if (keyToAdd === "^" && !/[0-9]/.test(previous) && previous !== ")") {
-    return;
-  }
-
-  if (previous === "^" && !/[0-9]/.test(keyToAdd)) {
-    return;
-  }
-
-  if (/[0-9]/.test(previous) && (keyToAdd === "log10(" || keyToAdd === "ln(")) {
-    return;
-  }
+  if (keyToAdd === "^" && !/[0-9]/.test(previous) && previous !== ")") return;
+  if (previous === "^" && !/[0-9]/.test(keyToAdd)) return;
 
   if ((isOperator(previous) || previous === "!") && keyToAdd === "!") return;
 
@@ -135,14 +127,7 @@ document.addEventListener("keydown", (event) => {
   }
 
   if (key === "Backspace") {
-    const secondLastChar = display.value[display.value.length - 2];
-    if (
-      previousValue === "(" &&
-      !/[0-9]/.test(secondLastChar) &&
-      !isOperator(secondLastChar)
-    ) {
-      display.value = display.value.slice(0, -2);
-    } else display.value = display.value.slice(0, -1);
+    display.value = display.value.slice(0, -1);
 
     if (display.value === "") display.value = 0;
   }
@@ -157,15 +142,7 @@ clearButton.addEventListener("click", () => {
 });
 
 backspaceButton.addEventListener("click", () => {
-  const previousValue = display.value[display.value.length - 1];
-  const secondLastChar = display.value[display.value.length - 2];
-  if (
-    previousValue === "(" &&
-    !/[0-9]/.test(secondLastChar) &&
-    !isOperator(secondLastChar)
-  ) {
-    display.value = display.value.slice(0, -2);
-  } else display.value = display.value.slice(0, -1);
+  display.value = display.value.slice(0, -1);
 
   if (display.value === "") display.value = 0;
 });
@@ -174,74 +151,11 @@ calculateButton.addEventListener("click", () => {
   performCalculations();
 });
 
-piButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "π");
-});
-
-sqrtButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "√(");
-});
-
-expButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "^");
-});
-
-logButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "log10(");
-});
-
-lnButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "ln(");
-});
-
-factorialButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "!");
-});
-
-sinButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "sin(");
-});
-
-cosButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "cos(");
-});
-
-tanButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "tan(");
-});
-
-asinButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "sin⁻¹(");
-});
-
-acosButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "cos⁻¹(");
-});
-
-atanButton.addEventListener("click", () => {
-  errorMessage.textContent = "";
-  const previousValue = display.value[display.value.length - 1];
-  validateAndAppendKey(previousValue, "tan⁻¹(");
+Object.entries(advancedButtons).forEach(([id, value]) => {
+  const button = document.getElementById(id);
+  button.addEventListener("click", () => {
+    errorMessage.textContent = "";
+    const previousValue = display.value[display.value.length - 1];
+    validateAndAppendKey(previousValue, value);
+  });
 });
