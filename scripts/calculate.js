@@ -255,7 +255,6 @@ function wrapTrigFn(expression) {
       });
     }
   } while (prevExpression !== newExpression);
-
   return newExpression;
 }
 
@@ -277,15 +276,11 @@ function calculateOperators(expressionArr, operators, operationMap) {
 }
 
 export function evaluateExpression(expression) {
-  expression = expression.replace(/Math\.sqrt\(?([\d.]+)\)?/g, (_, num) =>
-    Math.sqrt(Number(num))
-  );
-  expression = expression.replace(/(\d+)!/, (_, num) => factorial(Number(num)));
+  expression = expression
+    .replace(/Math\.sqrt\(?([\d.]+)\)?/g, (_, num) => Math.sqrt(Number(num)))
+    .replace(/(\d+)!/g, (_, num) => factorial(Number(num)));
 
-  expression = logBase10(expression);
-
-  expression = lnCalculate(expression);
-  expression = calculateTrig(expression);
+  expression = calculateTrig(lnCalculate(logBase10(expression)));
 
   const parsedArr = parseExpression(expression);
   const exponentResults = eliminateAllExponents(parsedArr);
@@ -307,16 +302,19 @@ export function calculateFullExpression(expression) {
   if (error !== true) {
     return error;
   }
-  const replacePI = replacePi(expression);
-  const replaceSquare = replaceSquareRoot(replacePI);
-  const replaceLogs = replaceLog10(replaceSquare);
-  const replaceLn = replaceln(replaceLogs);
-  const wrappedFactorial = wrapFactorial(replaceLn);
-  const wrappedTrig = wrapTrigFn(wrappedFactorial);
-  const addedMultiply = addMultiply(wrappedTrig);
+
+  const transformedExpression = [
+    replacePi,
+    replaceSquareRoot,
+    replaceLog10,
+    replaceln,
+    wrapFactorial,
+    wrapTrigFn,
+    addMultiply,
+  ].reduce((expr, fn) => fn(expr), expression);
 
   let innermostParentheses = /\(([^()]+)\)/g;
-  let updatedExpression = addedMultiply;
+  let updatedExpression = transformedExpression;
   while (innermostParentheses.test(updatedExpression)) {
     updatedExpression = updatedExpression.replace(
       innermostParentheses,
@@ -326,5 +324,5 @@ export function calculateFullExpression(expression) {
       }
     );
   }
-  return evaluateExpression(updatedExpression);
+  return Number(evaluateExpression(updatedExpression).toFixed(10));
 }

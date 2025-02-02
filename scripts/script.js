@@ -66,9 +66,11 @@ function validateAndAppendKey(previous, keyToAdd) {
     return;
   }
 
-  if (display.value === "-" || (previous === "+" && keyToAdd === "-")) {
-    if (!isValidToReplace(keyToAdd) || keyToAdd === "." || keyToAdd === "-")
-      return;
+  if (
+    (display.value === "-" && !isValidToReplace(keyToAdd)) ||
+    (previous === "+" && keyToAdd === "-")
+  ) {
+    if (keyToAdd === "." || keyToAdd === "-") return;
     display.value = display.value.slice(0, -1) + keyToAdd;
     return;
   }
@@ -85,11 +87,13 @@ function validateAndAppendKey(previous, keyToAdd) {
     "sin⁻¹(",
     "cos⁻¹(",
     "tan⁻¹(",
+    "√(",
   ];
   if (
     (previous === ")" && /[0-9]/.test(keyToAdd)) ||
-    (!isOperator(previous) && previous !== "(" && keyToAdd === "√(") ||
-    invalidFunctionCalls.includes(keyToAdd) ||
+    (!isOperator(previous) &&
+      previous !== "(" &&
+      invalidFunctionCalls.includes(keyToAdd)) ||
     (previous === "(" && keyToAdd === ")") ||
     (previous === "." && keyToAdd === ".")
   ) {
@@ -97,7 +101,7 @@ function validateAndAppendKey(previous, keyToAdd) {
   }
 
   if (keyToAdd === "^" && !/[0-9]/.test(previous) && previous !== ")") return;
-  if (previous === "^" && !/[0-9]/.test(keyToAdd)) return;
+  if (previous === "^" && !/[0-9]/.test(keyToAdd) && keyToAdd !== "-") return;
 
   if ((isOperator(previous) || previous === "!") && keyToAdd === "!") return;
 
