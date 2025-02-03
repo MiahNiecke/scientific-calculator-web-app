@@ -14,6 +14,14 @@ function divide(num1, num2) {
   return num1 / num2;
 }
 
+function degreesToRadians(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+function radiansToDegrees(radians) {
+  return radians * (180 / Math.PI);
+}
+
 function exponent(expression) {
   const parts = expression.split("^");
   return Math.pow(Number(parts[0]), Number(parts[1]));
@@ -54,27 +62,27 @@ function calculateTrig(expression) {
   const regexFnObj = {
     sinRegex: {
       regex: /sinTrig\(?(-?\d+(\.\d+)?)\)?/g,
-      fn: (_, num) => Math.sin(parseFloat(num)),
+      fn: (_, num) => Math.sin(degreesToRadians(parseFloat(num))),
     },
     cosRegex: {
       regex: /cosTrig\(?(-?\d+(\.\d+)?)\)?/g,
-      fn: (_, num) => Math.cos(parseFloat(num)),
+      fn: (_, num) => Math.cos(degreesToRadians(parseFloat(num))),
     },
     tanRegex: {
       regex: /tanTrig\(?(-?\d+(\.\d+)?)\)?/g,
-      fn: (_, num) => Math.tan(parseFloat(num)),
+      fn: (_, num) => Math.tan(degreesToRadians(parseFloat(num))),
     },
     asinRegex: {
       regex: /sin⁻¹Trig\(?(-?\d+(\.\d+)?)\)?/g,
-      fn: (_, num) => Math.asin(parseFloat(num)),
+      fn: (_, num) => radiansToDegrees(Math.asin(parseFloat(num))),
     },
     acosRegex: {
       regex: /cos⁻¹Trig\(?(-?\d+(\.\d+)?)\)?/g,
-      fn: (_, num) => Math.acos(parseFloat(num)),
+      fn: (_, num) => radiansToDegrees(Math.acos(parseFloat(num))),
     },
     atanRegex: {
       regex: /tan⁻¹Trig\(?(-?\d+(\.\d+)?)\)?/g,
-      fn: (_, num) => Math.atan(parseFloat(num)),
+      fn: (_, num) => radiansToDegrees(Math.atan(parseFloat(num))),
     },
   };
   let prevExpression;
@@ -281,7 +289,6 @@ export function evaluateExpression(expression) {
     .replace(/(\d+)!/g, (_, num) => factorial(Number(num)));
 
   expression = calculateTrig(lnCalculate(logBase10(expression)));
-
   const parsedArr = parseExpression(expression);
   const exponentResults = eliminateAllExponents(parsedArr);
 
@@ -324,5 +331,6 @@ export function calculateFullExpression(expression) {
       }
     );
   }
+
   return Number(evaluateExpression(updatedExpression).toFixed(10));
 }
